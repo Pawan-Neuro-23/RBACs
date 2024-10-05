@@ -1,0 +1,18 @@
+Scenarios : 
+1.	Owner:
+o	Creates repositories and project managers.
+o	No commit access ( they are administrators, not contributors )
+o	Can delete branches.
+2.	Project Manager:
+o	Commits to any branch.
+o	Adds/removes developers and manages their access.
+o	Can delete branches and assign PR reviewers.
+o	Can also review PR’s themselves.
+3.	Developer:
+o	Can create branches, push, and commit.
+o	Can review PRs where they are marked as a reviewer.
+o	Cannot delete branches.
+o	Can be promoted to project manager.
+4.	Branch-Level Permissions:
+o	Only certain roles or individuals can commit/delete branches like main. ( only project manager can let’s say )
+o	PR reviews can require multiple levels of approval.
