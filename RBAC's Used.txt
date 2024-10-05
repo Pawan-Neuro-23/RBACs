@@ -1,0 +1,14 @@
+Role-Based Access Control (RBAC)
+Roles Defined: We defined distinct roles (owner, project_manager, developer) and assigned permissions based on these roles.
+Permission Checks: Access to various actions (like creating branches, approving pull requests, or deleting branches) was governed by the user's role. For example:
+Owners could create project managers and delete branches.
+Project Managers could commit to branches, manage developers, and delete branches.
+
+
+Policy-Based Access Control (PBAC)
+We didn’t implement a full-fledged policy-based access control mechanism, but we did use some policy-like checks. For instance:
+Branch-Level Restrictions: We introduced a mechanism to restrict access to certain branches based on their status (e.g., restricted branches) and the user’s role. This can be seen as a simplistic form of policy-based access control since specific conditions (like branch restrictions) determine access.
+3. Attribute-Based Access Control (ABAC)
+Although we didn't explicitly implement attribute-based access control, we did use attributes (like restricted for branches and reviewer lists for pull requests) to enforce access controls. If we were to extend the system further, we could implement ABAC by:
+Considering user attributes (like experience level) for more granular control.
+Enabling dynamic access based on resource attributes (like branch names or other metadata).

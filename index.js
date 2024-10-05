@@ -1,4 +1,3 @@
-
 /*
 We have four users: Alice (Owner), Bob (Project Manager), Charlie (Developer) and Dave (Developer).
 An in-memory users array holds user information.
@@ -6,11 +5,11 @@ An in-memory repositories array holds repositories created by the owner.
 We have a middleware function checkRole to restrict access based on the user's role.
 
 
-new feature in iteration 4 : 
-Pull Request Management: Users can create PRs, and assigned reviewers can approve or reject them.
+new feature in iteration 5 : 
+Branch-Level Permissions: Implement checks to restrict which users can commit or delete specific branches (like the main branch).
+Multiple Reviewer Approvals: Implement a requirement for multiple approvals for pull requests, making it necessary for a defined number of reviewers to approve before merging.
 
 */
-
 const express = require('express');
 const app = express();
 app.use(express.json());
@@ -31,9 +30,9 @@ let repositories = [
 
 // In-memory data structure for branches
 let branches = [
-  { repoId: 1, name: "main" },
-  { repoId: 1, name: "develop" },
-  { repoId: 2, name: "main" },
+  { repoId: 1, name: "main", restricted: true }, // Restricted branch
+  { repoId: 1, name: "develop", restricted: false },
+  { repoId: 2, name: "main", restricted: true },
 ];
 
 // In-memory data structure for pull requests
@@ -57,6 +56,18 @@ function checkRole(allowedRoles) {
   };
 }
 
+// Middleware to check branch restrictions
+function checkBranchRestrictions(branchName) {
+  return (req, res, next) => {
+    const branch = branches.find(b => b.name === branchName && b.repoId === parseInt(req.params.repoId));
+    if (!branch) return res.status(404).json({ message: "Branch not found" });
+    if (branch.restricted && req.user.role === roles.DEVELOPER) {
+      return res.status(403).json({ message: "You do not have permission to access this branch." });
+    }
+    next();
+  };
+}
+
 // Route for Owners to create project managers
 app.post('/users/:id/promote', checkRole([roles.OWNER]), (req, res) => {
   const { id } = req.params;
@@ -72,7 +83,7 @@ app.post('/users/:id/promote', checkRole([roles.OWNER]), (req, res) => {
 // Route for Project Managers to create branches
 app.post('/repositories/:repoId/branches', checkRole([roles.PROJECT_MANAGER]), (req, res) => {
   const { repoId } = req.params;
-  const { branchName } = req.body;
+  const { branchName, restricted = false } = req.body;
 
   const repo = repositories.find(r => r.id === parseInt(repoId));
   if (!repo) return res.status(404).json({ message: "Repository not found" });
@@ -82,7 +93,7 @@ app.post('/repositories/:repoId/branches', checkRole([roles.PROJECT_MANAGER]), (
   }
 
   repo.branches.push(branchName);
-  branches.push({ repoId: parseInt(repoId), name: branchName });
+  branches.push({ repoId: parseInt(repoId), name: branchName, restricted });
   res.status(201).json({ message: `Branch ${branchName} created` });
 });
 
@@ -107,6 +118,7 @@ app.post('/repositories/:repoId/pull-requests', checkRole([roles.DEVELOPER, role
     createdBy: req.user.id,
     reviewers,
     status: 'open',
+    approvals: []
   };
 
   pullRequests.push(pr);
@@ -125,7 +137,16 @@ app.post('/pull-requests/:prId/approve', checkRole([roles.DEVELOPER, roles.PROJE
     return res.status(403).json({ message: "You are not a reviewer for this PR" });
   }
 
-  pr.status = 'approved';
+  if (!pr.approvals.includes(req.user.id)) {
+    pr.approvals.push(req.user.id);
+  }
+
+  // Check if the PR has enough approvals
+  const requiredApprovals = Math.ceil(pr.reviewers.length / 2); // Example: majority approval
+  if (pr.approvals.length >= requiredApprovals) {
+    pr.status = 'approved';
+  }
+
   res.status(200).json({ message: "Pull request approved", pr });
 });
 
@@ -143,6 +164,20 @@ app.post('/pull-requests/:prId/reject', checkRole([roles.DEVELOPER, roles.PROJEC
 
   pr.status = 'rejected';
   res.status(200).json({ message: "Pull request rejected", pr });
+});
+
+// Route for Project Managers to delete a branch
+app.delete('/repositories/:repoId/branches/:branchName', checkRole([roles.PROJECT_MANAGER]), (req, res) => {
+  const { repoId, branchName } = req.params;
+  const repo = repositories.find(r => r.id === parseInt(repoId));
+  
+  if (!repo || !repo.branches.includes(branchName)) {
+    return res.status(404).json({ message: "Branch not found" });
+  }
+
+  repo.branches = repo.branches.filter(b => b !== branchName);
+  branches = branches.filter(b => b.repoId !== parseInt(repoId) || b.name !== branchName);
+  res.status(204).send();
 });
 
 // List all pull requests for a repository
