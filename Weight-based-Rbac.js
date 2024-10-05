@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
+
+// premium members => 3 , normal => 1 , gold => 2
+
 // In-memory data structure for members
 let members = [
   { id: 1, name: "Alice", membershipType: "premium", timeSlot: "Anytime", proteinBox: true, weight: 3 },
