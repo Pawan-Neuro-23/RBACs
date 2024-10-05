@@ -1,18 +1,16 @@
-Scenarios : 
-1.	Owner:
-o	Creates repositories and project managers.
-o	No commit access ( they are administrators, not contributors )
-o	Can delete branches.
-2.	Project Manager:
-o	Commits to any branch.
-o	Adds/removes developers and manages their access.
-o	Can delete branches and assign PR reviewers.
-o	Can also review PR’s themselves.
-3.	Developer:
-o	Can create branches, push, and commit.
-o	Can review PRs where they are marked as a reviewer.
-o	Cannot delete branches.
-o	Can be promoted to project manager.
-4.	Branch-Level Permissions:
-o	Only certain roles or individuals can commit/delete branches like main. ( only project manager can let’s say )
-o	PR reviews can require multiple levels of approval.
+Key Features of the Gym Membership System
+Membership Types:
+
+Normal Members: Fixed time slot access.
+Gold Members: Two time slots and access to a personalized trainer.
+Premium Members: Anytime access, two time slots, personalized trainer, and receive a protein box.
+Time Slot Assignment:
+
+Members are assigned a time slot during which they can access the gym. Gold members can select two slots.
+Subscription Plans:
+
+Members can choose from monthly, quarterly, or yearly subscriptions.
+Gym Rules:
+
+The gym is closed on Sundays.
+Premium members receive a protein box monthly.

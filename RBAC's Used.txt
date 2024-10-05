@@ -1,14 +1,19 @@
-Role-Based Access Control (RBAC)
-Roles Defined: We defined distinct roles (owner, project_manager, developer) and assigned permissions based on these roles.
-Permission Checks: Access to various actions (like creating branches, approving pull requests, or deleting branches) was governed by the user's role. For example:
-Owners could create project managers and delete branches.
-Project Managers could commit to branches, manage developers, and delete branches.
+Recap on Attribute based RBAC : 
+How will you handle resource -specific permissions?
+**** BAC and attribute based access control ****
 
+In some systems, permissions may not be tied to a user’s general role, but to a specific resource. For example, a manager might be allowed to edit one project but not others. ( JIRA best example )
+another example is : An editor can edit certain documents, but only view others.
 
-Policy-Based Access Control (PBAC)
-We didn’t implement a full-fledged policy-based access control mechanism, but we did use some policy-like checks. For instance:
-Branch-Level Restrictions: We introduced a mechanism to restrict access to certain branches based on their status (e.g., restricted branches) and the user’s role. This can be seen as a simplistic form of policy-based access control since specific conditions (like branch restrictions) determine access.
-3. Attribute-Based Access Control (ABAC)
-Although we didn't explicitly implement attribute-based access control, we did use attributes (like restricted for branches and reviewer lists for pull requests) to enforce access controls. If we were to extend the system further, we could implement ABAC by:
-Considering user attributes (like experience level) for more granular control.
-Enabling dynamic access based on resource attributes (like branch names or other metadata).
+possible mini solution : 
+// Hypothetical resource-level permissions model
+const resourcePermissions = [
+    { resourceId: 1, userId: 2, permissions: ['edit'] },  // User 2 can edit Resource 1
+    { resourceId: 2, userId: 2, permissions: ['view'] },  // User 2 can view Resource 2
+];
+
+// Check user permissions for a specific resource
+function checkResourcePermission(userId, resourceId, action) {
+    const permission = resourcePermissions.find(rp => rp.resourceId === resourceId && rp.userId === userId);
+    return permission?.permissions.includes(action);
+}
