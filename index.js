@@ -1,3 +1,8 @@
+
+// no user management
+// no authentication
+// no authorization
+
 const express = require('express');
 const app = express();
 const jsonServer = require('json-server');
