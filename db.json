@@ -1,0 +1,11 @@
+{
+	"users": [
+	  { "id": 1, "name": "Alice", "role": "admin", "type": "admin" },
+	  { "id": 2, "name": "Bob", "role": "user", "type": "user" }
+	],
+	"resources": [
+	  { "id": 1, "name": "Resource 1" },
+	  { "id": 2, "name": "Resource 2" }
+	]
+  }
+  
